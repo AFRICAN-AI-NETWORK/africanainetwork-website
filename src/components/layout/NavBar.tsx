@@ -173,7 +173,7 @@ const Navbar: React.FC<NavbarProps> = ({ transparent = false }) => {
               </Button>
             ) : (
               <Link
-                to="/signup"
+                to="/auth/signup"
                 className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-md transition-all"
               >
                 Get Started
