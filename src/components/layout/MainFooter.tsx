@@ -1,4 +1,5 @@
 import Logo from '@/assets/logo.svg';
+import { trackLinkClick } from '@/utils/analytics';
 import { FacebookIcon, LinkedinIcon } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -7,6 +8,10 @@ import TiktokIcon from '../simple/icons/TiktokIcon';
 import WhatsappIcon from '../simple/icons/WhatsappIcon';
 
 const MainFooter: React.FC = () => {
+  const handleLinkClick = (linkName: string, url: string) => {
+    trackLinkClick(linkName, url);
+  };
+
   return (
     <footer className="bg-secondary text-white">
       <div className="py-14 px-10 grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] content-center lg:justify-items-end lg:grid-cols-[45%_18%_18%_18%] gap-y-10">
@@ -32,6 +37,12 @@ const MainFooter: React.FC = () => {
               <a
                 href="https://www.facebook.com/groups/1490131391564053/?ref=share"
                 title="Visit our Facebook Page"
+                onClick={() =>
+                  handleLinkClick(
+                    'Facebook',
+                    'https://www.facebook.com/groups/1490131391564053/?ref=share'
+                  )
+                }
               >
                 <p className="sr-only">Visit our Facebook Page</p>
                 <FacebookIcon height={20} width={20} />
@@ -39,6 +50,12 @@ const MainFooter: React.FC = () => {
               <a
                 href="https://www.linkedin.com/groups/9802179"
                 title="Visit our LinkedIn Account"
+                onClick={() =>
+                  handleLinkClick(
+                    'LinkedIn',
+                    'https://www.linkedin.com/groups/9802179'
+                  )
+                }
               >
                 <p className="sr-only">Visit our LinkedIn Account</p>
                 <LinkedinIcon height={20} width={20} />
@@ -46,6 +63,9 @@ const MainFooter: React.FC = () => {
               <a
                 href="https://discord.gg/zytPSazu6S"
                 title="Join our Discord Channel"
+                onClick={() =>
+                  handleLinkClick('Discord', 'https://discord.gg/zytPSazu6S')
+                }
               >
                 <p className="sr-only">Join our Discord Channel</p>
                 <DiscordIcon height={20} width={20} />
@@ -53,6 +73,12 @@ const MainFooter: React.FC = () => {
               <a
                 href="https://chat.whatsapp.com/G2khjYh9eVOKOGXaoXEDDZ"
                 title="Join our Whatsapp community"
+                onClick={() =>
+                  handleLinkClick(
+                    'Whatsapp',
+                    'https://chat.whatsapp.com/G2khjYh9eVOKOGXaoXEDDZ'
+                  )
+                }
               >
                 <p className="sr-only">Join our Whatsapp community</p>
                 <WhatsappIcon height={20} width={20} />
@@ -60,6 +86,12 @@ const MainFooter: React.FC = () => {
               <a
                 href="https://tiktok.com/@african.ai.network"
                 title="Visit our Tiktok Channel"
+                onClick={() =>
+                  handleLinkClick(
+                    'Tiktok',
+                    'https://tiktok.com/@african.ai.network'
+                  )
+                }
               >
                 <p className="sr-only">Visit our Tiktok Channel</p>
                 <TiktokIcon height={20} width={20} />

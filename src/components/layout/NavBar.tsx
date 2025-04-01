@@ -19,6 +19,7 @@ import { navigationLinks } from '@/utils/constants';
 import { Confirm } from 'notiflix';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { trackLinkClick, trackEvent } from '@/utils/analytics';
 
 interface NavbarProps {
   transparent?: boolean;
@@ -36,6 +37,10 @@ const Navbar: React.FC<NavbarProps> = ({ transparent = false }) => {
     setIsOpen(!isOpen);
   };
 
+  const handleLinkClick = (linkName: string, url: string) => {
+    trackLinkClick(linkName, url);
+  };
+
   const handleLogout = () => {
     Confirm.show(
       'Logout',
@@ -43,6 +48,7 @@ const Navbar: React.FC<NavbarProps> = ({ transparent = false }) => {
       'Yes',
       'No',
       () => {
+        trackEvent('user_logout');
         storageHandler.removeCredentials();
         navigate('/auth/login');
       }
@@ -88,7 +94,7 @@ const Navbar: React.FC<NavbarProps> = ({ transparent = false }) => {
           : 'bg-primary'
       )}
     >
-      <Link to="/">
+      <Link to="/" onClick={() => handleLinkClick('Home Logo', '/')}>
         <p className="sr-only">Back to Home</p>
         <img src={Logo} alt="AAN logo" className="italic h-10 lg:h-14" />
       </Link>
@@ -117,7 +123,10 @@ const Navbar: React.FC<NavbarProps> = ({ transparent = false }) => {
                 <Link
                   to={link.to}
                   className="hover:text-blue-300 focus-visible:text-blue-300 transition-all"
-                  onClick={() => handleNavigation(link.to)}
+                  onClick={() => {
+                    handleNavigation(link.to);
+                    handleLinkClick(link.label, link.to);
+                  }}
                 >
                   {link.label}
                 </Link>
@@ -145,7 +154,10 @@ const Navbar: React.FC<NavbarProps> = ({ transparent = false }) => {
                                   i === 0 && 'mt-2',
                                   i === link.subLinks!.length - 1 && 'mb-2'
                                 )}
-                                onClick={() => handleNavigation(subLink.to)}
+                                onClick={() => {
+                                  handleNavigation(subLink.to);
+                                  handleLinkClick(subLink.label, subLink.to);
+                                }}
                               >
                                 {subLink.label}
                               </Link>
@@ -175,6 +187,7 @@ const Navbar: React.FC<NavbarProps> = ({ transparent = false }) => {
               <Link
                 to="/auth/signup"
                 className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-md transition-all"
+                onClick={() => handleLinkClick('Get Started', '/auth/signup')}
               >
                 Get Started
               </Link>
