@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { EyeIcon, EyeOffIcon, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import * as z from 'zod';
 
 // Import local components
 import NavBar from '@/components/layout/NavBar';
@@ -20,10 +20,9 @@ import {
 import { Input } from '@/components/ui/input';
 
 // Import services and utilities
-import axiosInstance from '@/lib/axios';
-import { storageHandler } from '@/lib/localStorage';
-import { errHandler } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import axiosInstance from '@/lib/axios';
+import { errHandler } from '@/lib/utils';
 
 const formSchema = z
   .object({
@@ -76,19 +75,18 @@ const SignupPage: React.FC = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const response = await axiosInstance.post('/auth/register', {
+      await axiosInstance.post('/auth/register', {
         name: `${values.firstName.trim()} ${values.lastName.trim()}`,
         email: values.email,
         password: values.password,
       });
 
-      storageHandler.setToken(response.data.accessToken);
       toast.toast({
         title: 'Signup Successful',
-        description: 'You have successfully signed up.',
+        description: 'Please check your email to verify your account.',
         variant: 'success',
       });
-      navigate('/');
+      navigate(`/auth/verify-email?email=${encodeURIComponent(values.email)}`);
     } catch (err) {
       console.error('An error occurred while trying to sign up', err);
       toast.toast({

@@ -24,6 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 import axiosInstance from '@/lib/axios';
 import { storageHandler } from '@/lib/localStorage';
 import { errHandler } from '@/lib/utils';
+import { AxiosError } from 'axios';
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -56,6 +57,14 @@ const LoginPage: React.FC = () => {
       navigate('/');
     } catch (err) {
       console.error('An error occurred while trying to log in', err);
+      if (err instanceof AxiosError) {
+        if (err.response?.data?.message === 'User not verified') {
+          navigate(
+            `/auth/verify-email?email=${encodeURIComponent(values.email)}`
+          );
+          return;
+        }
+      }
       toast.toast({
         title: 'Login Failed',
         description: errHandler(err),
@@ -157,7 +166,7 @@ const LoginPage: React.FC = () => {
               </div>
 
               <Button variant="link" asChild>
-                <a href="#">Forgot Password?</a>
+                <a href="/auth/forgot-password">Forgot Password?</a>
               </Button>
             </div>
 

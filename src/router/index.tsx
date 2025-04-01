@@ -1,13 +1,16 @@
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { storageHandler } from '@/lib/localStorage';
+import { validateAuth } from '@/lib/auth';
+import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage';
+import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
+import VerifyEmailPage from '@/pages/auth/VerifyEmailPage';
 import HomePage from '@/pages/HomePage';
 import React, { lazy, Suspense } from 'react';
 import {
-  Navigate,
   Route,
   BrowserRouter as Router,
   Routes,
   useLocation,
+  useNavigate,
 } from 'react-router-dom';
 
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
@@ -23,15 +26,41 @@ const CoursesPage = lazy(() => import('@/pages/CoursesPage'));
 const EventsPage = lazy(() => import('@/pages/EventsPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
-// Authentication Check
-const isAuthenticated = () => !!storageHandler.getToken();
-
 const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  if (!isAuthenticated()) {
-    // Redirect to login page if not authenticated
-    return <Navigate to="/auth/login" state={{ from: location }} replace />;
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      const auth = await validateAuth();
+      console.log(auth, location.pathname);
+
+      if (!auth.isValid) {
+        console.log('REDIRECTING TO LOGIN');
+        // Redirect to login if not authenticated
+        navigate('/auth/login', { state: { from: location }, replace: true });
+      } else if (
+        !auth.isVerified &&
+        location.pathname !== '/auth/verify-email'
+      ) {
+        console.log('NAVIGATING TO VERIFY EMAIL');
+        // Redirect to verify email if not verified
+        navigate(
+          auth.user && auth.user.email
+            ? `/auth/verify-email?email=${encodeURIComponent(auth.user.email)}`
+            : `/auth/verify-email`
+        );
+      }
+
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, []);
+
+  if (isLoading) {
+    return <LoadingSpinner fullScreen />;
   }
 
   return <>{children}</>;
@@ -40,9 +69,39 @@ const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 const RedirectIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  if (isAuthenticated()) {
-    // Redirect to home if already authenticated
-    return <Navigate to="/" replace />;
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      const auth = await validateAuth();
+      console.log(auth, location.pathname);
+
+      if (auth.isValid && auth.isVerified) {
+        // Redirect to home if already authenticated and verified
+        navigate('/', { replace: true });
+      } else if (
+        auth.isValid &&
+        !auth.isVerified &&
+        location.pathname !== '/auth/verify-email'
+      ) {
+        console.log('here');
+        // Redirect to verify email if not verified
+        navigate(
+          auth.user && auth.user.email
+            ? `/auth/verify-email?email=${encodeURIComponent(auth.user.email)}`
+            : `/auth/verify-email`
+        );
+      }
+
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, []);
+
+  if (isLoading) {
+    return <LoadingSpinner fullScreen />;
   }
 
   return <>{children}</>;
@@ -58,12 +117,48 @@ const AppRouter: React.FC = () => {
           <Route
             path="/auth/*"
             element={
-              <RedirectIfAuthenticated>
-                <Routes>
-                  <Route path="login" element={<LoginPage />} />
-                  <Route path="signup" element={<SignupPage />} />
-                </Routes>
-              </RedirectIfAuthenticated>
+              <Routes>
+                <Route
+                  path="login"
+                  element={
+                    <RedirectIfAuthenticated>
+                      <LoginPage />
+                    </RedirectIfAuthenticated>
+                  }
+                />
+                <Route
+                  path="signup"
+                  element={
+                    <RedirectIfAuthenticated>
+                      <SignupPage />
+                    </RedirectIfAuthenticated>
+                  }
+                />
+                <Route
+                  path="reset-password"
+                  element={
+                    <RedirectIfAuthenticated>
+                      <ResetPasswordPage />
+                    </RedirectIfAuthenticated>
+                  }
+                />
+                <Route
+                  path="forgot-password"
+                  element={
+                    <RedirectIfAuthenticated>
+                      <ForgotPasswordPage />
+                    </RedirectIfAuthenticated>
+                  }
+                />
+                <Route
+                  path="verify-email"
+                  element={
+                    <RequireAuth>
+                      <VerifyEmailPage />
+                    </RequireAuth>
+                  }
+                />
+              </Routes>
             }
           />
           <Route
