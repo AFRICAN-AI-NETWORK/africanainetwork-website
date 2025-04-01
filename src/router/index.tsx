@@ -34,17 +34,14 @@ const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   React.useEffect(() => {
     const checkAuth = async () => {
       const auth = await validateAuth();
-      console.log(auth, location.pathname);
 
       if (!auth.isValid) {
-        console.log('REDIRECTING TO LOGIN');
         // Redirect to login if not authenticated
         navigate('/auth/login', { state: { from: location }, replace: true });
       } else if (
         !auth.isVerified &&
         location.pathname !== '/auth/verify-email'
       ) {
-        console.log('NAVIGATING TO VERIFY EMAIL');
         // Redirect to verify email if not verified
         navigate(
           auth.user && auth.user.email
@@ -75,7 +72,6 @@ const RedirectIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({
   React.useEffect(() => {
     const checkAuth = async () => {
       const auth = await validateAuth();
-      console.log(auth, location.pathname);
 
       if (auth.isValid && auth.isVerified) {
         // Redirect to home if already authenticated and verified
@@ -85,7 +81,6 @@ const RedirectIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({
         !auth.isVerified &&
         location.pathname !== '/auth/verify-email'
       ) {
-        console.log('here');
         // Redirect to verify email if not verified
         navigate(
           auth.user && auth.user.email

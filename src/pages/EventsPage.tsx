@@ -27,7 +27,7 @@ const EventsPage = () => {
         }`);
         setEvents(responseData);
       } catch (error) {
-        console.log('An error occurred while trying to fetch events', error);
+        console.error('An error occurred while trying to fetch events', error);
         Notify.failure('Error fetching events, please try again later');
       } finally {
         Loading.remove();
