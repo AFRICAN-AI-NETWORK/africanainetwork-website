@@ -127,7 +127,7 @@ const AiToolPage = () => {
       <NavBar />
 
       <main className="min-h-dvh">
-        {tool ? (
+        {tool && !loading ? (
           <div className="pt-40 xl:pt-36 lg:p-16">
             <div className="grid gap-5 xl:grid-cols-2">
               <div className="flex flex-col justify-between">

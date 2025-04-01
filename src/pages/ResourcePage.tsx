@@ -77,7 +77,7 @@ const ResourceComponent = () => {
       <NavBar />
 
       <main className="min-h-dvh">
-        {resource ? (
+        {resource && !loading ? (
           <div className="pt-40 xl:pt-36 p-5 lg:p-16">
             <div className="grid gap-5 xl:grid-cols-2 items-center">
               <div className="flex flex-col justify-center gap-3">
